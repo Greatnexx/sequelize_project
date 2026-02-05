@@ -11,10 +11,10 @@ npm install
 
 2. Update `.env` file with your database and Redis credentials
 
-3. Make sure MySQL and Redis are running
+3. Make sure Sequelize and Redis are running
 
 4. Start the server:
-```bash
+```bashn
 npm run dev
 ```
 

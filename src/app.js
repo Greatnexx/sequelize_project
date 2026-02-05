@@ -1,7 +1,7 @@
 import express from 'express';
 import { testConnections } from './config/testConnection.js';
 import sequelize from './config/database.js';
-import routers from "./routes/index.js"
+import routers from './routes/index.js';
 import dotenv from 'dotenv';
 import { errorHandler, notFound } from './middlewares/errorHandler.js';
 
@@ -22,10 +22,10 @@ async function startServer() {
     if (!connected) {
       process.exit(1);
     }
-    
+
     await sequelize.sync();
     console.log('✅ Database synced');
-    
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
