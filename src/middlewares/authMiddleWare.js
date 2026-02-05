@@ -19,7 +19,7 @@ const protect = async(req, res, next) => {
       const redisToken = await redisClient.get(`token:${userId}`);
       if (!redisToken || redisToken !== token) {
         return res.status(401).json({
-          error: 'Invalid or expired token'
+          error: 'Invalid or expired token',
         });
       }
 
@@ -27,7 +27,7 @@ const protect = async(req, res, next) => {
       const user = await User.findByPk(userId);
       if (!user) {
         return res.status(404).json({
-          error: 'User not found'
+          error: 'User not found',
         });
       }
 
@@ -35,14 +35,13 @@ const protect = async(req, res, next) => {
       return next();
 
     } catch (error) {
-      return res.status(401).json({
-        error: 'Not authorized, token failed'
-      });
+      next(error);
+
     }
   }
 
   return res.status(401).json({
-    error: 'Not authorized, no token'
+    error: 'Not authorized, no token',
   });
 };
 

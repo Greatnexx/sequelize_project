@@ -1,30 +1,37 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import User from '../../models/User.js';
 import redisClient from '../../config/redis.js';
+import { sendResponse } from '../../utils/responseHelper.js';
+import { exclude } from '../../utils/exclude.js';
+import generateToken from '../../utils/generateToken.js';
 
-
-
-export const login = async (req, res) => {
+export const login = async(req, res, next) => {
   try {
     const { email, password } = req.body;
-    
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return sendResponse(res, 401, false, 'Invalid credentials');
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return sendResponse(res, 401, false, 'Invalid credentials');
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
-    await redisClient.setEx(`token:${user.id}`, 3600, token);
+    const token = generateToken(user.id);
 
-    res.json({ token, userId: user.id });
+   const redis_key = `auth_token:${user.id}`;
+
+
+    await redisClient.set(redis_key, token, {
+      EX: parseInt(process.env.EXP_TIME),
+    });
+
+     const user_obj = exclude(user.toJSON(), ['password']);
+
+    sendResponse(res, 200, true, 'Login successful', {token, user: user_obj });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };

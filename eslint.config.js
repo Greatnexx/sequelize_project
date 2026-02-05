@@ -4,6 +4,9 @@ import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
   {
+    ignores: ['node_modules/', 'dist/'],
+  },
+  {
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },
     languageOptions: {
@@ -31,7 +34,7 @@ export default defineConfig([
       'no-var': 'error',
       'prefer-const': 'error',
       'eqeqeq': ['error', 'always'],
-      'no-console': 'warn',
+      'no-console': 'off',
 
       // Code Quality
       'no-trailing-spaces': 'error',
